@@ -16,7 +16,7 @@ function cardHTML(p) {
 
 try {
   listEl.textContent = '載入中…';
-  const res = await axios.get('http://127.0.0.1:5000/api/posts', { timeout: 10000 });
+  const res = await axios.get('/api/posts', { timeout: 10000 });
   const posts = res.data;
 
   if (!Array.isArray(posts) || posts.length === 0) {
