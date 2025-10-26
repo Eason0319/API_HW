@@ -1,3 +1,5 @@
+# db/engine.py (新版本)
+
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
@@ -9,10 +11,7 @@ load_dotenv()
 # 從環境變數中讀取資料庫 URL
 # Vercel 會自動設定 POSTGRES_URL
 # 為了相容性，我們也檢查 DATABASE_URL
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", 
-    "POSTGRES_URL=postgresql://neondb_owner:npg_AYMCGZmDNB86@ep-super-block-adyh5t5k-pooler.c-2.us-east-1.aws.neon.tech/neondb"
-)
+DATABASE_URL = os.getenv("POSTGRES_URL") or os.getenv("DATABASE_URL")
 
 if DATABASE_URL is None:
     # 如果在雲端和 .env 中都找不到，就退回使用本地 SQLite 作為備用
