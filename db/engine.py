@@ -1,22 +1,33 @@
-# db/engine.py
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from dotenv import load_dotenv
 
-# 使用 SQLite，資料庫檔案將會是專案根目錄下的 blog.db
-SQLALCHEMY_DATABASE_URL = "sqlite:///./blog.db"
+# 載入 .env 檔案中的環境變數 (這行在本機開發時非常有用)
+load_dotenv()
 
+# 從環境變數中讀取資料庫 URL
+# Vercel 會自動設定 POSTGRES_URL
+# 為了相容性，我們也檢查 DATABASE_URL
+DATABASE_URL = os.getenv("POSTGRES_URL") or os.getenv("DATABASE_URL")
+
+if DATABASE_URL is None:
+    # 如果在雲端和 .env 中都找不到，就退回使用本地 SQLite 作為備用
+    print("警告：未找到 POSTGRES_URL 或 DATABASE_URL 環境變數，將使用本地 SQLite 資料庫。")
+    DATABASE_URL = "sqlite:///./blog.db"
+
+# 建立 SQLAlchemy engine
+# 如果 URL 以 'postgres://' 開頭，SQLAlchemy 會知道要使用 PostgreSQL
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, 
-    connect_args={"check_same_thread": False} # 這是 SQLite 的特殊要求
+    DATABASE_URL,
+    # 如果是 SQLite，才需要這個參數
+    **({"connect_args": {"check_same_thread": False}} if DATABASE_URL.startswith("sqlite") else {})
 )
 
-# 建立 SessionLocal 類別，之後我們會用它來建立資料庫 session
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# 建立 Base 類別，我們之後建立的 model 都會繼承它
 Base = declarative_base()
 
-# 提供一個 dependency，讓 FastAPI 可以在每個請求中取得資料庫 session
 def get_db():
     db = SessionLocal()
     try:
