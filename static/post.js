@@ -14,7 +14,7 @@ const slug = params.get('slug');
  * 渲染文章內容到左側區塊
  */
 function renderArticle(post) {
-  const author = post.author ?? '';
+  const author = post.author.name ?? '';
   const title = post.title ?? '無標題';
   const body = post.content || '';
 
@@ -58,7 +58,7 @@ async function loadComments() {
       // 將留言資料轉換成 HTML
       const commentsHTML = comments.map(comment => `
         <div class="mb-3">
-          <p class="font-semibold text-slate-800">${comment.author ?? '匿名'}</p>
+          <p class="font-semibold text-slate-800">${comment.author.name ?? '匿名'}</p>
           <p class="text-slate-600 text-sm">${comment.text ?? ''}</p>
         </div>
       `).join('');
@@ -89,8 +89,8 @@ async function loadLikes() {
     } else {
       const likesHTML = likes.map(like => `
         <div class="flex items-center gap-3 mb-3">
-          <img src="${like.profilePic}" alt="${like.name}" class="w-10 h-10 rounded-full object-cover border-2 border-slate-200">
-          <p class="font-semibold text-slate-800">${like.name ?? '匿名'}</p>
+          <img src="${like.profilePic}" alt="${like.author.name}" class="w-10 h-10 rounded-full object-cover border-2 border-slate-200">
+          <p class="font-semibold text-slate-800">${like.author.name ?? '匿名'}</p>
         </div>
       `).join('');
 
